@@ -281,8 +281,8 @@ nav{padding:.6rem 1rem}
 
 <script>
 // ===== Hand-drawn canvas (Kevin Ngo ink aesthetic) =====
-// Paper texture, wobbly lines, crosshatching, construction marks, grain
-// Professional technical drawing vibe, NOT illustrations
+// Paper texture, grain, wobbly lines — extremely subtle blueprint background
+// Purpose: adds warmth and hand-crafted feel without distracting from content
 const cv=document.getElementById('bg');
 const x=cv.getContext('2d');
 let W,H,dpr;
@@ -300,7 +300,7 @@ function rng(s){let a=(s*1000003)>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imu
 
 // Wobbly line (hand-drawn ink effect)
 function wLine(x1,y1,x2,y2,w,seg,jit){
-w=w||1;seg=seg||6;jit=jit||1.5;
+w=w||.8;seg=seg||5;jit=jit||.8;
 const dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
 if(len===0)return;
 const nx=-dy/len,ny=dx/len;
@@ -313,20 +313,20 @@ x.lineTo(x1+dx*t+nx*j,y1+dy*t+ny*j);
 x.strokeStyle='#1e1630';x.lineWidth=w;x.lineCap='round';x.lineJoin='round';x.stroke();
 }
 
-// Crosshatch shading (Kevin Ngo ink style)
+// Crosshatch shading
 function hatch(rx,ry,rw,rh,sp,angle){
-sp=sp||5;angle=angle||45;
+sp=sp||6;angle=angle||45;
 const rad=angle*Math.PI/180;
 x.save();x.beginPath();x.rect(rx,ry,rw,rh);x.clip();
-x.globalAlpha=.1;x.lineWidth=.4;
+x.globalAlpha=.06;x.lineWidth=.3;
 for(let i=-rw;i<rw+rh;i+=sp){
 x.beginPath();
 x.moveTo(rx+i*Math.cos(rad)-rh*Math.sin(rad),ry+i*Math.sin(rad)+rh*Math.cos(rad));
 x.lineTo(rx+i*Math.cos(rad)+rw*Math.sin(rad),ry+i*Math.sin(rad)-rw*Math.cos(rad));
 x.stroke();
 }
-x.globalAlpha=.05;
-for(let i=-rw;i<rw+rh;i+=sp*1.4){
+x.globalAlpha=.03;
+for(let i=-rw;i<rw+rh;i+=sp*1.5){
 x.beginPath();
 x.moveTo(rx+i*Math.cos(-rad)-rh*Math.sin(-rad),ry+i*Math.sin(-rad)+rh*Math.cos(-rad));
 x.lineTo(rx+i*Math.cos(-rad)+rw*Math.sin(-rad),ry+i*Math.sin(-rad)-rw*Math.cos(-rad));
@@ -335,127 +335,32 @@ x.stroke();
 x.restore();
 }
 
-// Construction/corner marks (blueprint style)
-function constr(xc,yc,w,h,alpha){
-alpha=alpha||.04;
-x.strokeStyle=`rgba(70,100,255,${alpha})`;x.lineWidth=.4;x.setLineDash([3,4]);
-x.strokeRect(xc-w/2,yc-h/2,w,h);
-x.setLineDash([]);
-const m=10;
-x.lineWidth=.7;x.strokeStyle=`rgba(70,100,255,${alpha*1.5})`;
-[[xc-w/2,yc-h/2,1,1],[xc+w/2,yc-h/2,-1,1],[xc-w/2,yc+h/2,1,-1],[xc+w/2,yc+h/2,-1,-1]].forEach(([cx2,cy2,dx,dy])=>{
-x.beginPath();x.moveTo(cx2+dx*m,cy2);x.lineTo(cx2,cy2);x.lineTo(cx2,cy2+dy*m);x.stroke();
-});
-}
-
-// Paper grain
-function grain(xg,yg,ww,hh,a){
-a=a||.012;
-for(let i=0;i<ww*hh*a;i++){
-xg.fillStyle=Math.random()>.5?`rgba(0,0,0,${Math.random()*.03})`:`rgba(255,255,255,${Math.random()*.03})`;
-xg.fillRect(Math.random()*ww+Math.random()*2,Math.random()*hh+Math.random()*2,1,1);
-}
-}
-
-// Static grain layer
+// Paper grain (static layer)
 let grainCvs;
 function mkGrain(){
 grainCvs=document.createElement('canvas');
 grainCvs.width=W;grainCvs.height=H;
 const gc=grainCvs.getContext('2d');
-grain(gc,0,0,W,H,.006);
+gc.globalAlpha=.015;
+for(let i=0;i<W*H*.003;i++){
+gc.fillStyle=Math.random()>.5?`rgba(0,0,0,${Math.random()*.02})`:`rgba(255,255,255,${Math.random()*.02})`;
+gc.fillRect(Math.random()*W,Math.random()*H,1,1);
+}
+gc.globalAlpha=1;
 }
 mkGrain();
 window.addEventListener('resize',mkGrain);
 
-// ===== Animated elements: abstract technical drawing shapes =====
-// Wobbly geometric forms that float subtly — feels like a designer's sketchbook margin
+// ===== Very subtle animated elements =====
+// Single wobbly geometric shape on the right — one element, not a cluster
+// Faint dotted grid as background texture
 
-class DrawnCircle{
-constructor(x,y,r,phase){this.x=x;this.y=y;this.r=r;this.phase=phase;this.t=0}
-update(dt){this.t+=dt}
-draw(){
-const breath=Math.sin(this.t*.5+this.phase)*.15;
-const rx=this.x+Math.sin(this.t*.3+this.phase)*3;
-const ry=this.y+Math.cos(this.t*.25+this.phase)*3;
-// wobbly circle
-x.beginPath();
-const pts=24;
-for(let i=0;i<=pts;i++){
-const an=i/pts*Math.PI*2;
-const jitter=(rng(i*7777+Math.round(this.t*10))-.5)*1.5;
-const px=rx+Math.cos(an)*(this.r*(1+breath)+jitter);
-const py=ry+Math.sin(an)*(this.r*(1+breath*.8)+jitter);
-if(i===0)x.moveTo(px,py);
-else x.lineTo(px,py);
-}
-x.closePath();
-x.globalAlpha=.08;
-x.strokeStyle='#1e1630';x.lineWidth=.6;x.stroke();
-x.fillStyle='#1e1630';x.fill();
-x.globalAlpha=1;
-}
-}
-
-class DrawnRect{
-constructor(x,y,w,h,phase){this.x=x;this.y=y;this.w=w;this.h=h;this.phase=phase;this.t=0}
-update(dt){this.t+=dt}
-draw(){
-const drift=Math.sin(this.t*.4+this.phase)*4;
-const rx=this.x+drift;
-const ry=this.y+Math.cos(this.t*.35+this.phase)*2;
-// wobbly rect with corner marks
-const cw=10;
-// main shape
-wLine(rx,ry,rx+this.w,ry,1,8,1.2);
-wLine(rx+this.w,ry,rx+this.w,ry+this.h,1,8,1.2);
-wLine(rx+this.w,ry+this.h,rx,ry+this.h,1,8,1.2);
-wLine(rx,ry+this.h,rx,ry,1,8,1.2);
-// hatching
-hatch(rx+2,ry+2,this.w-4,this.h-4,4,45);
-// corner ticks
-const m=6;
-x.lineWidth=.6;x.strokeStyle=`rgba(30,22,48,.25)`;
-[[rx,ry,1,1],[rx+this.w,ry,-1,1],[rx,ry+this.h,1,-1],[rx+this.w,ry+this.h,-1,-1]].forEach(([cx2,cy2,dx,dy])=>{
-x.beginPath();x.moveTo(cx2+dx*m,cy2);x.lineTo(cx2,cy2);x.lineTo(cx2,cy2+dy*m);x.stroke();
-});
-}
-}
-
-class DrawnLine{
-constructor(x1,y1,x2,y2,phase,w){this.x1=x1;this.y1=y1;this.x2=x2;this.y2=y2;this.phase=phase;this.w=w||.7;this.t=0}
-update(dt){this.t+=dt}
-draw(){
-const dx=(this.x2-this.x1),dy=(this.y2-this.y1);
-const midX=this.x1+dx*.5+Math.sin(this.t*.35+this.phase)*5;
-const midY=this.y1+dy*.5+Math.cos(this.t*.3+this.phase)*4;
-wLine(this.x1,this.y1,midX,midY,this.w,6,1);
-wLine(midX,midY,this.x2,this.y2,this.w,6,1);
-}
-}
-
-// Create geometric elements — scattered, subtle, professional
-const circles=[
-new DrawnCircle(0,0,60,0),
-new DrawnCircle(0,0,35,2),
-new DrawnCircle(0,0,20,4),
-];
-const rects=[
-new DrawnRect(0,0,80,80,1),
-new DrawnRect(0,0,50,70,3),
-];
-const lines=[
-new DrawnLine(0,0,0,0,0,0.5),
-new DrawnLine(0,0,0,0,2,0.5),
-new DrawnLine(0,0,0,0,4,0.4),
-];
-
-// Grid dots (subtle background texture)
+// Grid dots — very sparse, barely visible
 const gridDots=[];
-for(let i=0;i<40;i++){
+for(let i=0;i<25;i++){
 gridDots.push({
 x:Math.random(),y:Math.random(),
-r:Math.random()*1+.5,
+r:Math.random()*.5+.3,
 phase:Math.random()*Math.PI*2,
 });
 }
@@ -470,56 +375,86 @@ x.clearRect(0,0,w,h);
 // Grain overlay
 if(grainCvs)x.drawImage(grainCvs,0,0,w,h);
 
-// Hero area: subtle geometric elements positioned in margins, NOT over text
 const cx=w/2;
-const heroTop=h*.15;
-const heroBot=h*.65;
 
-// Grid dots — very faint background texture
+// Grid dots — extremely faint
 gridDots.forEach(d=>{
-d.phase+=dt*.2;
+d.phase+=dt*.1;
 const px=d.x*w,py=d.y*h;
 x.beginPath();x.arc(px,py,d.r,0,Math.PI*2);
-x.fillStyle=`rgba(30,22,48,${.04+Math.sin(d.phase)*.02})`;
+x.fillStyle=`rgba(30,22,48,${.03+Math.sin(d.phase)*.01})`;
 x.fill();
 });
 
-// Left side: vertical technical lines
-lines[0].x1=w*.08;lines[0].y1=heroTop;lines[0].x2=w*.08;lines[0].y2=heroBot;
-lines[0].update(dt);lines[0].draw();
-
-lines[1].x1=w*.06;lines[1].y1=heroTop+h*.1;lines[1].x2=w*.12;lines[1].y2=heroBot+h*.1;
-lines[1].update(dt);lines[1].draw();
-
-// Right side: geometric shapes
-circles[0].x=w*.88;circles[0].y=h*.4;
-circles[0].update(dt);circles[0].draw();
-
-circles[1].x=w*.85;circles[1].y=h*.35;
-circles[1].update(dt);circles[1].draw();
-
-circles[2].x=w*.9;circles[2].y=h*.5;
-circles[2].update(dt);circles[2].draw();
-
-rects[0].x=w*.82;rects[0].y=h*.25;
-rects[0].update(dt);rects[0].draw();
-
-rects[1].x=w*.87;rects[1].y=h*.45;
-rects[1].update(dt);rects[1].draw();
-
-// Construction marks framing the content area
-constr(cx,h*.42,w*.7,h*.45,.03);
-
-// Accent dots orbiting
-for(let i=0;i<5;i++){
-const an=i/5*Math.PI*2+now*.0002;
-const r=100+Math.sin(now*.0005+i)*20;
-const ox=cx+w*.75+Math.cos(an)*r;
-const oy=h*.42+Math.sin(an)*r*.5;
-x.beginPath();x.arc(ox,oy,1.2,0,Math.PI*2);
-const acc=['#c8473f','#28f0e0','#ff2bd6','#ffe22b','#5cff5c'];
-x.fillStyle=acc[i];x.globalAlpha=.1;x.fill();x.globalAlpha=1;
+// Single subtle wobbly circle on the right side — not overlapping text area
+const circR=45;
+const circBreath=Math.sin(now*.0004)*.08;
+const circDrift=Math.sin(now*.0003)*4;
+const cx2=cx+w*.25+circDrift;
+const cy2=h*.48;
+x.beginPath();
+const pts=20;
+for(let i=0;i<=pts;i++){
+const an=i/pts*Math.PI*2;
+const j=(rng(i*7777+Math.round(now*.01))-.5)*.8;
+const px=cx2+Math.cos(an)*(circR*(1+circBreath)+j);
+const py=cy2+Math.sin(an)*(circR*(1+circBreath*.8)+j);
+if(i===0)x.moveTo(px,py);
+else x.lineTo(px,py);
 }
+x.closePath();
+x.globalAlpha=.05;
+x.strokeStyle='#1e1630';x.lineWidth=.5;x.stroke();
+x.fillStyle='#1e1630';x.fill();
+x.globalAlpha=1;
+
+// Tiny inner circle (concentric, blueprint feel)
+x.beginPath();
+for(let i=0;i<=pts;i++){
+const an=i/pts*Math.PI*2;
+const j=(rng(i*3333+Math.round(now*.015))-.5)*.5;
+const px=cx2+Math.cos(an)*(circR*.4*(1+circBreath*.7)+j);
+const py=cy2+Math.sin(an)*(circR*.4*(1+circBreath*.6)+j);
+if(i===0)x.moveTo(px,py);
+else x.lineTo(px,py);
+}
+x.closePath();
+x.globalAlpha=.04;
+x.strokeStyle='#1e1630';x.lineWidth=.4;x.stroke();
+x.globalAlpha=1;
+
+// Single thin wobbly vertical line on left edge — barely there
+const lx=w*.06;
+const ly1=h*.2;
+const ly2=h*.7;
+const midLy=ly1+(ly2-ly1)*.5+Math.sin(now*.0004)*5;
+wLine(lx,ly1,lx,midLy,.4,6,.5);
+wLine(lx,midLy,lx,ly2,.4,6,.5);
+
+// Small corner bracket marks (construction-line style) — extremely faint
+const bx=cx+w*.18;
+const by=h*.38;
+const bw=w*.3;
+const bh=h*.25;
+x.globalAlpha=.03;
+x.strokeStyle='#1e1630';x.lineWidth=.4;x.setLineDash([2,3]);
+x.strokeRect(bx,by,bw,bh);
+x.setLineDash([]);
+const cm=5;
+x.lineWidth=.5;
+[[bx,by,1,1],[bx+bw,by,-1,1],[bx,by+bh,1,-1],[bx+bw,by+bh,-1,-1]].forEach(([ccx,ccy,ddx,ddy])=>{
+x.beginPath();x.moveTo(ccx+ddx*cm,ccy);x.lineTo(ccx,ccy);x.lineTo(ccx,ccy+ddy*cm);x.stroke();
+});
+x.globalAlpha=1;
+
+// Single wobbly rect with faint hatching — right side, small
+const rx2=cx+w*.22;
+const ry2=h*.68;
+wLine(rx2,ry2,rx2+35,ry2,.5,5,.6);
+wLine(rx2+35,ry2,rx2+35,ry2+45,.5,5,.6);
+wLine(rx2+35,ry2+45,rx2,ry2+45,.5,5,.6);
+wLine(rx2,ry2+45,rx2,ry2,.5,5,.6);
+hatch(rx2+1,ry2+1,33,43,5,45);
 
 requestAnimationFrame(anim);
 }
