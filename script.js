@@ -1,0 +1,22 @@
+'use strict';
+const video=document.querySelector('#hero-video');
+const toggle=document.querySelector('#video-toggle');
+const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+let userPaused=reducedMotion.matches;
+function syncVideoButton(){toggle.innerHTML=video.paused?'Play <span aria-hidden="true">▶</span>':'Pause <span aria-hidden="true">Ⅱ</span>';toggle.setAttribute('aria-label',video.paused?'Play background video':'Pause background video');}
+video.addEventListener('play',syncVideoButton);video.addEventListener('pause',syncVideoButton);
+if(reducedMotion.matches){video.autoplay=false;video.pause();}else{video.muted=true;video.play().catch(syncVideoButton);}syncVideoButton();
+toggle.addEventListener('click',()=>{userPaused=!video.paused;if(video.paused){video.play().catch(syncVideoButton);}else{video.pause();}});
+reducedMotion.addEventListener('change',e=>{if(e.matches){userPaused=true;video.pause();}});
+const heroObserver=new IntersectionObserver(entries=>{const visible=entries[0].isIntersecting;if(!visible){video.pause();}else if(!userPaused&&!document.hidden){video.play().catch(syncVideoButton);}},{threshold:.05});heroObserver.observe(document.querySelector('.hero'));
+document.addEventListener('visibilitychange',()=>{if(document.hidden){video.pause();}else if(!userPaused&&document.querySelector('.hero').getBoundingClientRect().bottom>0){video.play().catch(syncVideoButton);}});
+video.addEventListener('error',()=>{toggle.textContent='Video unavailable';toggle.disabled=true;});
+const filters=[...document.querySelectorAll('[data-filter]')];
+filters.forEach(button=>button.addEventListener('click',()=>{const category=button.dataset.filter;filters.forEach(b=>b.setAttribute('aria-pressed',String(b===button)));let count=0;document.querySelectorAll('.project').forEach(card=>{const show=category==='all'||card.dataset.category===category;card.hidden=!show;if(show)count++;});document.querySelector('.work-count').textContent=`${count} projects`;}));
+const dialog=document.querySelector('#film-dialog');
+const player=document.querySelector('#film-player');
+let returnFocus=null;
+document.querySelectorAll('[data-video]').forEach(link=>link.addEventListener('click',e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||!dialog.showModal)return;e.preventDefault();returnFocus=link;document.querySelector('#film-title').textContent=link.dataset.title;document.querySelector('#youtube-link').href=link.href;const frame=document.createElement('iframe');frame.src=`https://www.youtube-nocookie.com/embed/${link.dataset.video}?autoplay=1&rel=0`;frame.title=link.dataset.title;frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';player.replaceChildren(frame);dialog.showModal();document.body.classList.add('modal-open');video.pause();}));
+document.querySelector('#close-film').addEventListener('click',()=>dialog.close());
+dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+dialog.addEventListener('close',()=>{player.replaceChildren();document.body.classList.remove('modal-open');returnFocus?.focus();});
