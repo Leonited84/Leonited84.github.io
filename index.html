@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leo Houssami | Digital Producer & Programme Manager</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#1e1630 #f3e6cf}
+body{background:#f3e6cf;color:#1e1630;font-family:'Inter',sans-serif;line-height:1.7;overflow-x:hidden}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100vh;z-index:0;pointer-events:none;opacity:.7}
+.progress-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#c8473f,#28f0e0,#ff2bd6);z-index:100;transition:width .1s;width:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:.8rem 1.5rem;display:flex;justify-content:space-between;align-items:center;background:rgba(243,230,207,.9);backdrop-filter:blur(8px);border-bottom:2px solid #1e1630;transition:transform .3s}
+nav.hidden{transform:translateY(-100%)}
+.nav-logo{font-family:'Caveat',cursive;font-size:1.6rem;font-weight:700;color:#1e1630;letter-spacing:1px}
+.nav-links{display:flex;gap:1.2rem;list-style:none;flex-wrap:wrap}
+.nav-links a{font-size:.7rem;font-weight:500;color:#3a2e4a;text-decoration:none;letter-spacing:1px;text-transform:uppercase;position:relative;padding-bottom:3px;transition:color .3s}
+.nav-links a:hover{color:#c8473f}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:#c8473f;transition:width .3s}
+.nav-links a:hover::after{width:100%}
+main{position:relative;z-index:1}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative}
+.hero-content{position:relative;z-index:2;text-shadow:0 0 40px rgba(243,230,207,.85),0 0 80px rgba(243,230,207,.4);mix-blend-mode:normal}
+.hero-name{font-family:'Caveat',cursive;font-size:clamp(3.5rem,10vw,8rem);font-weight:700;color:#1e1630;line-height:1;margin-bottom:.3rem;opacity:0;animation:titleIn 1s .4s forwards}
+.hero-role{font-size:clamp(.85rem,2vw,1.1rem);font-weight:500;color:#3a2e4a;letter-spacing:3px;text-transform:uppercase;opacity:0;animation:fadeUp .6s .9s forwards}
+.hero-tagline{max-width:500px;margin-top:1.5rem;font-size:clamp(.85rem,1.3vw,1rem);color:#3a2e4a;line-height:1.8;opacity:0;animation:fadeUp .6s 1.2s forwards}
+.scroll-arrow{position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);width:24px;height:38px;border:2px solid #1e1630;border-radius:12px;opacity:0;animation:fadeUp .6s 1.8s forwards}
+.scroll-arrow::before{content:'';width:4px;height:4px;background:#1e1630;border-radius:50%;position:absolute;top:6px;left:50%;transform:translateX(-50%);animation:scrollDot 2s infinite}
+@keyframes titleIn{to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scrollDot{0%,100%{top:6px;opacity:.3}50%{top:24px;opacity:1}}
+.section{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:7rem 2rem 4rem;opacity:0;transform:translateY(50px);transition:all .9s cubic-bezier(.16,1,.3,1)}
+.section.visible{opacity:1;transform:translateY(0)}
+.container{max-width:820px;width:100%}
+.section-header{margin-bottom:2.5rem}
+.section-num{font-family:'Caveat',cursive;font-size:.8rem;letter-spacing:3px;color:#c8473f;display:flex;align-items:center;gap:.75rem}
+.section-num::before{content:'';width:35px;height:2px;background:#c8473f}
+.section-title{font-family:'Caveat',cursive;font-size:clamp(2.2rem,5vw,3.5rem);font-weight:700;color:#1e1630;margin-top:.4rem}
+.about-lead{font-size:1.05rem;line-height:2;color:#3a2e4a}
+.about-lead strong{color:#1e1630;font-weight:600}
+.about-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-top:2rem}
+.stat-card{text-align:center;padding:1.25rem;border:2px solid #1e1630;position:relative;background:#f3e6cf;transition:all .3s}
+.stat-card:hover{background:#1e1630;color:#f3e6cf}
+.stat-card:hover .stat-num,.stat-card:hover .stat-label{color:#f3e6cf}
+.stat-card:hover::before{top:-8px;left:-8px;right:-8px;bottom:-8px;border-color:#c8473f}
+.stat-card::before{content:'';position:absolute;top:-5px;left:-5px;right:-5px;bottom:-5px;border:1px solid #1e1630;pointer-events:none;transition:all .3s}
+.stat-num{font-family:'Caveat',cursive;font-size:2.2rem;font-weight:700;color:#1e1630;transition:color .3s}
+.stat-label{font-size:.65rem;letter-spacing:1px;text-transform:uppercase;color:#3a2e4a;transition:color .3s}
+.timeline{position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:#1e1630}
+.exp{position:relative;margin-bottom:3rem;padding-left:1.5rem;opacity:0;transform:translateX(-15px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.exp.visible{opacity:1;transform:translateX(0)}
+.exp::before{content:'';position:absolute;left:-2.4rem;top:.35rem;width:12px;height:12px;border:2px solid #1e1630;background:#f3e6cf;border-radius:50%;transition:all .3s}
+.exp.visible::before{background:#c8473f;border-color:#c8473f}
+.exp-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.4rem;margin-bottom:.3rem}
+.exp-role{font-family:'Caveat',cursive;font-size:1.5rem;font-weight:700;color:#1e1630}
+.exp-company{font-size:.95rem;font-weight:600;color:#c8473f}
+.exp-date{font-size:.7rem;letter-spacing:1px;color:#3a2e4a;text-transform:uppercase;padding:.2rem .65rem;border:1px solid #1e1630;white-space:nowrap}
+.exp-desc{color:#3a2e4a;font-size:.88rem;line-height:1.8}
+.exp-desc ul{list-style:none;padding:0;margin-top:.4rem}
+.exp-desc li{padding:.15rem 0;padding-left:1.1rem;position:relative}
+.exp-desc li::before{content:'>';position:absolute;left:0;color:#c8473f;font-weight:700;font-family:'Caveat',cursive;font-size:1.1rem}
+.exp-rec{margin-top:.6rem;padding:.4rem 1rem;background:#c8473f;color:#f3e6cf;font-family:'Caveat',cursive;font-size:1rem;font-weight:600;display:inline-block;transform:rotate(-1deg)}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.skill-card{padding:1.25rem;border:2px solid #1e1630;position:relative;background:#f3e6cf;transition:all .3s}
+.skill-card:hover{transform:translate(-4px,-4px);box-shadow:4px 4px 0 #1e1630}
+.skill-icon{font-size:1.4rem;margin-bottom:.4rem}
+.skill-name{font-family:'Caveat',cursive;font-size:1.25rem;font-weight:700;color:#1e1630;margin-bottom:.4rem}
+.skill-desc{font-size:.78rem;color:#3a2e4a;line-height:1.6}
+.edu-row{display:flex;justify-content:space-between;align-items:center;padding:1.25rem;border:2px solid #1e1630;margin-bottom:.75rem;background:#f3e6cf;transition:all .3s;flex-wrap:wrap;gap:.5rem}
+.edu-row:hover{box-shadow:4px 4px 0 #c8473f;transform:translate(-2px,-2px)}
+.edu-title{font-family:'Caveat',cursive;font-size:1.3rem;font-weight:700;color:#1e1630}
+.edu-school{font-size:.85rem;color:#c8473f;font-weight:500}
+.edu-year{font-family:'Caveat',cursive;font-size:1.2rem;color:#3a2e4a}
+.cert-item{padding:.6rem 1rem;border:1px dashed #1e1630;margin-bottom:.5rem;display:flex;align-items:center;gap:.75rem;transition:all .3s}
+.cert-item:hover{border-style:solid;background:rgba(30,22,48,.03)}
+.cert-icon{font-size:1rem}
+.cert-name{font-size:.88rem;color:#1e1630;font-weight:500}
+.cert-by{font-size:.72rem;color:#3a2e4a}
+.langs{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem}
+.lang-tag{padding:.4rem 1.2rem;font-family:'Caveat',cursive;font-size:1.15rem;font-weight:600;border:2px solid #1e1630;transition:all .3s;cursor:default}
+.lang-tag:hover{background:#1e1630;color:#f3e6cf}
+.lang-tag .lvl{font-size:.65rem;color:#3a2e4a;text-transform:uppercase;letter-spacing:1px;display:block;font-family:'Inter',sans-serif;font-weight:400}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.75rem}
+.contact-card{padding:1.25rem;border:2px solid #1e1630;text-decoration:none;color:#1e1630;display:flex;flex-direction:column;gap:.2rem;transition:all .3s;background:#f3e6cf}
+.contact-card:hover{transform:translate(-4px,-4px);box-shadow:4px 4px 0 #c8473f;background:#1e1630;color:#f3e6cf}
+.contact-card:hover .c-label{color:rgba(243,230,207,.6)}
+.contact-card:hover .c-value{color:#f3e6cf}
+.c-label{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:#3a2e4a;transition:color .3s}
+.c-value{font-weight:600;font-size:.85rem}
+.footer{text-align:center;padding:2.5rem 2rem;border-top:2px solid #1e1630}
+.footer p{font-size:.75rem;color:#3a2e4a}
+@media(max-width:768px){
+nav{padding:.6rem 1rem}
+.nav-links{gap:.6rem}
+.nav-links a{font-size:.6rem}
+.section{padding:5rem 1.2rem 3rem}
+.exp-header{flex-direction:column;gap:.2rem}
+.about-stats{grid-template-columns:1fr 1fr}
+.skills-grid{grid-template-columns:1fr}
+.edu-row{flex-direction:column;align-items:flex-start;gap:.3rem}
+.contact-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="progress-bar" id="progress"></div>
+<nav id="nav">
+<div class="nav-logo">LH</div>
+<ul class="nav-links">
+<li><a href="#about">About</a></li>
+<li><a href="#experience">Experience</a></li>
+<li><a href="#skills">Skills</a></li>
+<li><a href="#education">Education</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+</nav>
+<main>
+<section class="hero" id="hero">
+<div class="hero-content">
+<h1 class="hero-name">Leo Houssami</h1>
+<p class="hero-role">Digital Producer &amp; Programme Manager</p>
+<p class="hero-tagline">Arabic-fluent producer &amp; programme manager specialising in digital content, cross-sector collaboration, and public sector delivery.</p>
+</div>
+<div class="scroll-arrow"></div>
+</section>
+
+<section id="about">
+<div class="container">
+<div class="section-header">
+<div class="section-num">01</div>
+<h2 class="section-title">About Me</h2>
+</div>
+<p class="about-lead">Partnerships and operations professional with experience across <strong>media production</strong>, <strong>stakeholder management</strong>, and <strong>commercial collaboration</strong>. Proven ability to execute high-volume projects, coordinate cross-functional teams, and translate ideas into deliverables under tight timelines. Brings a practical understanding of partnerships, negotiation, and audience engagement, with a strong focus on execution, alignment, and results.</p>
+<p class="about-lead" style="margin-top:1rem">Born in Lebanon and <strong>Arabic-fluent</strong>, I work across cultural contexts with government agencies, First Nations communities, and multilingual populations.</p>
+<div class="about-stats">
+<div class="stat-card"><div class="stat-num">100+</div><div class="stat-label">Productions per year</div></div>
+<div class="stat-card"><div class="stat-num">$1M+</div><div class="stat-label">Funding managed</div></div>
+<div class="stat-card"><div class="stat-num">10+</div><div class="stat-label">Years experience</div></div>
+<div class="stat-card"><div class="stat-num">Arabic</div><div class="stat-label">Native language</div></div>
+</div>
+</div>
+</section>
+
+<section id="experience">
+<div class="container">
+<div class="section-header">
+<div class="section-num">02</div>
+<h2 class="section-title">Experience</h2>
+</div>
+<div class="timeline">
+
+<div class="exp">
+<div class="exp-header">
+<div><div class="exp-role">Partnerships Specialist</div><div class="exp-company">Easygo</div></div>
+<div class="exp-date">June 2025 – Feb 2026</div>
+</div>
+<div class="exp-desc"><ul>
+<li>Automated partnership lead acquisition using AI agents (n8n, Claude, Streamcharts API, HubSpot)</li>
+<li>Managed partnership and sponsorship propositions against company policy and contract structure</li>
+<li>Co-designed operational deliverables and compliance frameworks to mitigate organisational risk</li>
+<li>Contributed to commercial discussions between external partners, legal professionals, and internal stakeholders</li>
+</ul></div>
+</div>
+
+<div class="exp">
+<div class="exp-header">
+<div><div class="exp-role">Senior Multimedia Producer</div><div class="exp-company">Victoria University</div></div>
+<div class="exp-date">2023 – 2025</div>
+</div>
+<div class="exp-desc"><ul>
+<li>Delivered multimedia coverage for academic and cultural programs within the Moondani Balluk Indigenous Academic Unit</li>
+<li>Managed three producers/editors delivering multimedia learning assets across campuses</li>
+<li>Produced and published the weekly "People of VU" podcast with Vice-Chancellor Adam Shoemaker</li>
+<li>Implemented captions, transcripts, graphics, and web/internal publishing workflows</li>
+</ul></div>
+<div class="exp-rec">Tech Innovation Award 2025</div>
+</div>
+
+<div class="exp">
+<div class="exp-header">
+<div><div class="exp-role">STEM Systems Educator</div><div class="exp-company">Wyndham Tech School</div></div>
+<div class="exp-date">2021 – 2023</div>
+</div>
+<div class="exp-desc"><ul>
+<li>Designed and delivered immersive STEM programs (VR, robotics, game design, drones) for western Melbourne students</li>
+<li>Facilitated workshops for students with diverse learning needs, including FLIP Flexible Learning Intervention Pathways</li>
+<li>Mentored students experiencing social and learning barriers, creating inclusive learning environments</li>
+<li>Led classroom activities requiring teamwork, problem-solving, and confidence-building</li>
+</ul></div>
+<div class="exp-rec">Tech Excellence Award 2022</div>
+</div>
+
+<div class="exp">
+<div class="exp-header">
+<div><div class="exp-role">Job Coach / Employment Services</div><div class="exp-company">atWork Australia</div></div>
+<div class="exp-date">2019 – 2021</div>
+</div>
+<div class="exp-desc"><ul>
+<li>Managed caseload of jobseekers including individuals with disabilities and complex employment barriers</li>
+<li>Provided one-on-one coaching in resume development, interview preparation, and job readiness</li>
+<li>Supported culturally and linguistically diverse clients, including Arabic-speaking migrants and refugees</li>
+<li>Collaborated with employers, training providers, and community organisations for job placements</li>
+</ul></div>
+</div>
+
+<div class="exp">
+<div class="exp-header">
+<div><div class="exp-role">Senior Media Producer</div><div class="exp-company">Diakrit International</div></div>
+<div class="exp-date">2015 – 2019</div>
+</div>
+<div class="exp-desc"><ul>
+<li>Shot and produced real estate content with 24-hour turnaround, ensuring 100% visual consistency</li>
+<li>Managed logistics for daily property bookings across multiple states</li>
+<li>Trained junior staff in SOPs, quality standards, and on-site safety protocols</li>
+</ul></div>
+</div>
+
+</div>
+</div>
+</section>
+
+<section id="skills">
+<div class="container">
+<div class="section-header">
+<div class="section-num">03</div>
+<h2 class="section-title">Skills</h2>
+</div>
+<div class="skills-grid">
+<div class="skill-card"><div class="skill-icon">&#127912;</div><div class="skill-name">Digital Production</div><div class="skill-desc">Video production, editing, motion graphics, photography, content strategy, multimedia workflow</div></div>
+<div class="skill-card"><div class="skill-icon">&#128203;</div><div class="skill-name">Program Management</div><div class="skill-desc">Government funding, stakeholder engagement, cross-sector collaboration, compliance, reporting</div></div>
+<div class="skill-card"><div class="skill-icon">&#9981;</div><div class="skill-name">AI &amp; Automation</div><div class="skill-desc">CRM automation, workflow design, AI agents (Claude, n8n), tool integration, process optimisation</div></div>
+<div class="skill-card"><div class="skill-icon">&#128172;</div><div class="skill-name">Communication</div><div class="skill-desc">Research communications, cross-cultural messaging, First Nations collaboration, multilingual</div></div>
+<div class="skill-card"><div class="skill-icon">&#128187;</div><div class="skill-name">Technical</div><div class="skill-desc">Astro, Next.js, TypeScript, Python, Docker, Vercel, Git, Framer, API integration</div></div>
+<div class="skill-card"><div class="skill-icon">&#128202;</div><div class="skill-name">Research</div><div class="skill-desc">Counter-terrorism comms (ASSP/AVERT), data-driven content, evidence-based communications</div></div>
+</div>
+</div>
+</section>
+
+<section id="education">
+<div class="container">
+<div class="section-header">
+<div class="section-num">04</div>
+<h2 class="section-title">Education</h2>
+</div>
+<div class="edu-row"><div><div class="edu-title">Bachelor of Film and Television</div><div class="edu-school">Deakin University</div></div><div class="edu-year">2017</div></div>
+<div class="edu-row"><div><div class="edu-title">Advanced Diploma of Business</div><div class="edu-school">Hales Institute of Business</div></div><div class="edu-year">2008</div></div>
+<h3 style="font-family:'Caveat',cursive;font-size:1.7rem;margin:2rem 0 1rem;color:#1e1630">Certifications</h3>
+<div class="cert-item"><span class="cert-icon">&#127891;</span><div><div class="cert-name">Google Project Management Certificate</div><div class="cert-by">Google Training</div></div></div>
+<div class="cert-item"><span class="cert-icon">&#127891;</span><div><div class="cert-name">Case Management Certification</div><div class="cert-by">Alison</div></div></div>
+<div class="cert-item"><span class="cert-icon">&#127891;</span><div><div class="cert-name">Case Management Course</div><div class="cert-by">Elevify</div></div></div>
+<div class="cert-item"><span class="cert-icon">&#127891;</span><div><div class="cert-name">Safe Community Educator</div><div class="cert-by">Kangan Institute</div></div></div>
+<div class="langs">
+<div class="lang-tag">English<span class="lvl">Native</span></div>
+<div class="lang-tag">&#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577; <span class="lvl">Fluent</span></div>
+</div>
+</div>
+</section>
+
+<section id="contact">
+<div class="container">
+<div class="section-header">
+<div class="section-num">05</div>
+<h2 class="section-title">Get In Touch</h2>
+</div>
+<div class="contact-grid">
+<a class="contact-card" href="mailto:leohoussami@gmail.com"><span class="c-label">Email</span><span class="c-value">leohoussami@gmail.com</span><span class="c-value" style="font-size:.7rem;color:#3a2e4a">0466 202 000</span></a>
+<a class="contact-card" href="https://linkedin.com/in/leonited84" target="_blank" rel="noopener"><span class="c-label">LinkedIn</span><span class="c-value">linkedin.com/in/Leonited84</span></a>
+<a class="contact-card" href="https://github.com/Leonited84" target="_blank" rel="noopener"><span class="c-label">GitHub</span><span class="c-value">github.com/Leonited84</span></a>
+<a class="contact-card" href="https://silkroadleo.com" target="_blank" rel="noopener"><span class="c-label">Website</span><span class="c-value">silkroadleo.com</span></a>
+</div>
+</div>
+</section>
+
+<footer class="footer">
+<p>Melbourne, Australia &#183; ABN 27 218 061 213 &#183; VIC WWCC (2056405A-01)</p>
+</footer>
+</main>
+
+<script>
+// ===== Hand-drawn canvas (Kevin Ngo ink aesthetic) =====
+// Paper texture, wobbly lines, crosshatching, construction marks, grain
+// Professional technical drawing vibe, NOT illustrations
+const cv=document.getElementById('bg');
+const x=cv.getContext('2d');
+let W,H,dpr;
+function resize(){
+dpr=window.devicePixelRatio||1;
+W=cv.width=window.innerWidth*dpr;
+H=cv.height=window.innerHeight*dpr;
+x.setTransform(dpr,0,0,dpr,0,0);
+}
+resize();
+window.addEventListener('resize',resize);
+
+// Seeded RNG (deterministic, no boiling)
+function rng(s){let a=(s*1000003)>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+// Wobbly line (hand-drawn ink effect)
+function wLine(x1,y1,x2,y2,w,seg,jit){
+w=w||1;seg=seg||6;jit=jit||1.5;
+const dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+if(len===0)return;
+const nx=-dy/len,ny=dx/len;
+x.beginPath();x.moveTo(x1,y1);
+for(let i=1;i<=seg;i++){
+const t=i/seg;
+const j=(rng(i*12345+i*789)-.5)*jit;
+x.lineTo(x1+dx*t+nx*j,y1+dy*t+ny*j);
+}
+x.strokeStyle='#1e1630';x.lineWidth=w;x.lineCap='round';x.lineJoin='round';x.stroke();
+}
+
+// Crosshatch shading (Kevin Ngo ink style)
+function hatch(rx,ry,rw,rh,sp,angle){
+sp=sp||5;angle=angle||45;
+const rad=angle*Math.PI/180;
+x.save();x.beginPath();x.rect(rx,ry,rw,rh);x.clip();
+x.globalAlpha=.1;x.lineWidth=.4;
+for(let i=-rw;i<rw+rh;i+=sp){
+x.beginPath();
+x.moveTo(rx+i*Math.cos(rad)-rh*Math.sin(rad),ry+i*Math.sin(rad)+rh*Math.cos(rad));
+x.lineTo(rx+i*Math.cos(rad)+rw*Math.sin(rad),ry+i*Math.sin(rad)-rw*Math.cos(rad));
+x.stroke();
+}
+x.globalAlpha=.05;
+for(let i=-rw;i<rw+rh;i+=sp*1.4){
+x.beginPath();
+x.moveTo(rx+i*Math.cos(-rad)-rh*Math.sin(-rad),ry+i*Math.sin(-rad)+rh*Math.cos(-rad));
+x.lineTo(rx+i*Math.cos(-rad)+rw*Math.sin(-rad),ry+i*Math.sin(-rad)-rw*Math.cos(-rad));
+x.stroke();
+}
+x.restore();
+}
+
+// Construction/corner marks (blueprint style)
+function constr(xc,yc,w,h,alpha){
+alpha=alpha||.04;
+x.strokeStyle=`rgba(70,100,255,${alpha})`;x.lineWidth=.4;x.setLineDash([3,4]);
+x.strokeRect(xc-w/2,yc-h/2,w,h);
+x.setLineDash([]);
+const m=10;
+x.lineWidth=.7;x.strokeStyle=`rgba(70,100,255,${alpha*1.5})`;
+[[xc-w/2,yc-h/2,1,1],[xc+w/2,yc-h/2,-1,1],[xc-w/2,yc+h/2,1,-1],[xc+w/2,yc+h/2,-1,-1]].forEach(([cx2,cy2,dx,dy])=>{
+x.beginPath();x.moveTo(cx2+dx*m,cy2);x.lineTo(cx2,cy2);x.lineTo(cx2,cy2+dy*m);x.stroke();
+});
+}
+
+// Paper grain
+function grain(xg,yg,ww,hh,a){
+a=a||.012;
+for(let i=0;i<ww*hh*a;i++){
+xg.fillStyle=Math.random()>.5?`rgba(0,0,0,${Math.random()*.03})`:`rgba(255,255,255,${Math.random()*.03})`;
+xg.fillRect(Math.random()*ww+Math.random()*2,Math.random()*hh+Math.random()*2,1,1);
+}
+}
+
+// Static grain layer
+let grainCvs;
+function mkGrain(){
+grainCvs=document.createElement('canvas');
+grainCvs.width=W;grainCvs.height=H;
+const gc=grainCvs.getContext('2d');
+grain(gc,0,0,W,H,.006);
+}
+mkGrain();
+window.addEventListener('resize',mkGrain);
+
+// ===== Animated elements: abstract technical drawing shapes =====
+// Wobbly geometric forms that float subtly — feels like a designer's sketchbook margin
+
+class DrawnCircle{
+constructor(x,y,r,phase){this.x=x;this.y=y;this.r=r;this.phase=phase;this.t=0}
+update(dt){this.t+=dt}
+draw(){
+const breath=Math.sin(this.t*.5+this.phase)*.15;
+const rx=this.x+Math.sin(this.t*.3+this.phase)*3;
+const ry=this.y+Math.cos(this.t*.25+this.phase)*3;
+// wobbly circle
+x.beginPath();
+const pts=24;
+for(let i=0;i<=pts;i++){
+const an=i/pts*Math.PI*2;
+const jitter=(rng(i*7777+Math.round(this.t*10))-.5)*1.5;
+const px=rx+Math.cos(an)*(this.r*(1+breath)+jitter);
+const py=ry+Math.sin(an)*(this.r*(1+breath*.8)+jitter);
+if(i===0)x.moveTo(px,py);
+else x.lineTo(px,py);
+}
+x.closePath();
+x.globalAlpha=.08;
+x.strokeStyle='#1e1630';x.lineWidth=.6;x.stroke();
+x.fillStyle='#1e1630';x.fill();
+x.globalAlpha=1;
+}
+}
+
+class DrawnRect{
+constructor(x,y,w,h,phase){this.x=x;this.y=y;this.w=w;this.h=h;this.phase=phase;this.t=0}
+update(dt){this.t+=dt}
+draw(){
+const drift=Math.sin(this.t*.4+this.phase)*4;
+const rx=this.x+drift;
+const ry=this.y+Math.cos(this.t*.35+this.phase)*2;
+// wobbly rect with corner marks
+const cw=10;
+// main shape
+wLine(rx,ry,rx+this.w,ry,1,8,1.2);
+wLine(rx+this.w,ry,rx+this.w,ry+this.h,1,8,1.2);
+wLine(rx+this.w,ry+this.h,rx,ry+this.h,1,8,1.2);
+wLine(rx,ry+this.h,rx,ry,1,8,1.2);
+// hatching
+hatch(rx+2,ry+2,this.w-4,this.h-4,4,45);
+// corner ticks
+const m=6;
+x.lineWidth=.6;x.strokeStyle=`rgba(30,22,48,.25)`;
+[[rx,ry,1,1],[rx+this.w,ry,-1,1],[rx,ry+this.h,1,-1],[rx+this.w,ry+this.h,-1,-1]].forEach(([cx2,cy2,dx,dy])=>{
+x.beginPath();x.moveTo(cx2+dx*m,cy2);x.lineTo(cx2,cy2);x.lineTo(cx2,cy2+dy*m);x.stroke();
+});
+}
+}
+
+class DrawnLine{
+constructor(x1,y1,x2,y2,phase,w){this.x1=x1;this.y1=y1;this.x2=x2;this.y2=y2;this.phase=phase;this.w=w||.7;this.t=0}
+update(dt){this.t+=dt}
+draw(){
+const dx=(this.x2-this.x1),dy=(this.y2-this.y1);
+const midX=this.x1+dx*.5+Math.sin(this.t*.35+this.phase)*5;
+const midY=this.y1+dy*.5+Math.cos(this.t*.3+this.phase)*4;
+wLine(this.x1,this.y1,midX,midY,this.w,6,1);
+wLine(midX,midY,this.x2,this.y2,this.w,6,1);
+}
+}
+
+// Create geometric elements — scattered, subtle, professional
+const circles=[
+new DrawnCircle(0,0,60,0),
+new DrawnCircle(0,0,35,2),
+new DrawnCircle(0,0,20,4),
+];
+const rects=[
+new DrawnRect(0,0,80,80,1),
+new DrawnRect(0,0,50,70,3),
+];
+const lines=[
+new DrawnLine(0,0,0,0,0,0.5),
+new DrawnLine(0,0,0,0,2,0.5),
+new DrawnLine(0,0,0,0,4,0.4),
+];
+
+// Grid dots (subtle background texture)
+const gridDots=[];
+for(let i=0;i<40;i++){
+gridDots.push({
+x:Math.random(),y:Math.random(),
+r:Math.random()*1+.5,
+phase:Math.random()*Math.PI*2,
+});
+}
+
+// Main animation loop
+let lastT=performance.now();
+function anim(now){
+const dt=(now-lastT)/1000;lastT=now;
+const w=window.innerWidth,h=window.innerHeight;
+x.clearRect(0,0,w,h);
+
+// Grain overlay
+if(grainCvs)x.drawImage(grainCvs,0,0,w,h);
+
+// Hero area: subtle geometric elements positioned in margins, NOT over text
+const cx=w/2;
+const heroTop=h*.15;
+const heroBot=h*.65;
+
+// Grid dots — very faint background texture
+gridDots.forEach(d=>{
+d.phase+=dt*.2;
+const px=d.x*w,py=d.y*h;
+x.beginPath();x.arc(px,py,d.r,0,Math.PI*2);
+x.fillStyle=`rgba(30,22,48,${.04+Math.sin(d.phase)*.02})`;
+x.fill();
+});
+
+// Left side: vertical technical lines
+lines[0].x1=w*.08;lines[0].y1=heroTop;lines[0].x2=w*.08;lines[0].y2=heroBot;
+lines[0].update(dt);lines[0].draw();
+
+lines[1].x1=w*.06;lines[1].y1=heroTop+h*.1;lines[1].x2=w*.12;lines[1].y2=heroBot+h*.1;
+lines[1].update(dt);lines[1].draw();
+
+// Right side: geometric shapes
+circles[0].x=w*.88;circles[0].y=h*.4;
+circles[0].update(dt);circles[0].draw();
+
+circles[1].x=w*.85;circles[1].y=h*.35;
+circles[1].update(dt);circles[1].draw();
+
+circles[2].x=w*.9;circles[2].y=h*.5;
+circles[2].update(dt);circles[2].draw();
+
+rects[0].x=w*.82;rects[0].y=h*.25;
+rects[0].update(dt);rects[0].draw();
+
+rects[1].x=w*.87;rects[1].y=h*.45;
+rects[1].update(dt);rects[1].draw();
+
+// Construction marks framing the content area
+constr(cx,h*.42,w*.7,h*.45,.03);
+
+// Accent dots orbiting
+for(let i=0;i<5;i++){
+const an=i/5*Math.PI*2+now*.0002;
+const r=100+Math.sin(now*.0005+i)*20;
+const ox=cx+w*.75+Math.cos(an)*r;
+const oy=h*.42+Math.sin(an)*r*.5;
+x.beginPath();x.arc(ox,oy,1.2,0,Math.PI*2);
+const acc=['#c8473f','#28f0e0','#ff2bd6','#ffe22b','#5cff5c'];
+x.fillStyle=acc[i];x.globalAlpha=.1;x.fill();x.globalAlpha=1;
+}
+
+requestAnimationFrame(anim);
+}
+requestAnimationFrame(anim);
+
+// ===== Scroll behavior =====
+window.addEventListener('scroll',()=>{
+const st=window.scrollY,dh=document.documentElement.scrollHeight-window.innerHeight;
+document.getElementById('progress').style.width=(st/dh*100)+'%';
+});
+
+// Reveal sections
+const secs=document.querySelectorAll('section:not(.hero)');
+const exps=document.querySelectorAll('.exp');
+const obs=new IntersectionObserver(entries=>{
+entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.12,rootMargin:'0px 0px -20px 0px'});
+secs.forEach(s=>obs.observe(s));
+exps.forEach(e=>obs.observe(e));
+
+// Nav hide/show
+let ls=0;const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{
+const c=window.scrollY;
+if(c>ls&&c>100)nav.classList.add('hidden');
+else nav.classList.remove('hidden');
+ls=c;
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+a.addEventListener('click',e=>{
+e.preventDefault();
+const t=document.querySelector(a.getAttribute('href'));
+if(t)t.scrollIntoView({behavior:'smooth'});
+});
+});
+
+// Fade hero on scroll
+window.addEventListener('scroll',()=>{
+const s=window.scrollY,h=window.innerHeight;
+if(s<h){
+const f=1-s/h;
+document.querySelector('.hero-content').style.opacity=f;
+document.querySelector('.hero-content').style.transform=`translateY(${s*.15}px)`;
+}
+});
+
+// Print-friendly: hide canvas when printing
+window.addEventListener('beforeprint',()=>{document.getElementById('bg').style.display='none'});
+window.addEventListener('afterprint',()=>{document.getElementById('bg').style.display='block'});
+</script>
+</body>
+</html>
